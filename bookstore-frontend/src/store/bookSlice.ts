@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import actGetBook from "./act/actGetBook";
+import actPostBook from "./act/actPostBook";
+
 import { TBook } from "../types/book";
 import { TLoading } from "../types/shared";
 
@@ -21,6 +23,7 @@ const bookSlice = createSlice({
   initialState,
   reducers:{},
   extraReducers:(builder) => {
+    //get books
     builder.addCase(actGetBook.pending,(state)=>{
       state.loading= "pending";
       state.error = null;
@@ -35,7 +38,22 @@ const bookSlice = createSlice({
         state.error = action.payload
       }
     });
+    //post a book
+    builder.addCase(actPostBook.pending,(state)=>{
+      state.loading= "pending";
+      state.error = null;
+    });
+    builder.addCase(actPostBook.fulfilled,(state, action)=>{
+      state.loading= "succeeded";
+      state.books.push(action.payload);
+    });
+    builder.addCase(actPostBook.rejected,(state,action)=>{
+      state.loading= "failed";
+      if(action.payload && typeof action.payload === "string"){
+        state.error = action.payload
+      }
+    });
   }
 })
-export {actGetBook}
+export {actGetBook, actPostBook};
 export default bookSlice.reducer;
