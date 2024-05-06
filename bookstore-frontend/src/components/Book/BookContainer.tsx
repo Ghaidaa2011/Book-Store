@@ -1,19 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import BookInfo from "./BookInfo";
 import BooksList from "./BooksList";
 
 import "./book.css";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { actGetBook } from "../../store/bookSlice";
+import { actDeleteBook, actGetBook } from "../../store/bookSlice";
+import { TBook } from "../../types/book";
 
 const PostContainer = () => {
+  const [selectedBook, setSelectedBook] = useState<TBook>({});
   const dispatch = useAppDispatch();
-  const { loading, error, books } = useAppSelector((state) => state.books);
+  const {
+    loading,
+    error,
+    books,
+    //  bookInfo
+  } = useAppSelector((state) => state.books);
   const { isLoggedIn } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(actGetBook());
   }, [dispatch]);
+  const getBookId = (id: number) => {
+    const selectedBook = books.find((book) => book.id === id);
+    setSelectedBook((previousBook) => {
+      return { ...previousBook, ...selectedBook };
+    });
+  };
   return (
     <>
       <hr className="my-5" />
@@ -24,10 +37,12 @@ const PostContainer = () => {
             books={books}
             error={error}
             isLoggedIn={isLoggedIn}
+            deleteBook={actDeleteBook}
+            getBookId={getBookId}
           />
         </div>
         <div className="col side-line">
-          <BookInfo />
+          <BookInfo bookInfo={selectedBook} />
         </div>
       </div>
     </>

@@ -1,3 +1,8 @@
+import {
+  actDeleteBook,
+  // actReadBook
+} from "../../store/bookSlice";
+import { useAppDispatch } from "../../store/hooks";
 import { TBook } from "../../types/book";
 import { TLoading } from "../../types/shared";
 import Loading from "../Loading";
@@ -7,8 +12,18 @@ type TBookListProps = {
   error: null | string;
   books: TBook[];
   isLoggedIn: boolean;
+  deleteBook: typeof actDeleteBook;
+  getBookId: (id: string) => void;
 };
-const BooksList = ({ status, error, books, isLoggedIn }: TBookListProps) => {
+const BooksList = ({
+  status,
+  error,
+  books,
+  isLoggedIn,
+  deleteBook,
+  getBookId,
+}: TBookListProps) => {
+  const dispatch = useAppDispatch();
   const bookList =
     books.length > 0
       ? books.map((book) => (
@@ -22,10 +37,25 @@ const BooksList = ({ status, error, books, isLoggedIn }: TBookListProps) => {
                 type="button"
                 className="btn btn-primary"
                 disabled={!isLoggedIn}
+                onClick={() => getBookId(book.id)}
+                // onClick={() => dispatch(actReadBook(book))}
               >
                 Read
               </button>
-              <button type="button" className="btn btn-danger">
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() =>
+                  dispatch(deleteBook(book.id))
+                    .unwrap()
+                    .then((originalPromiseResult) => {
+                      console.log(originalPromiseResult);
+                    })
+                    .catch((rejectedValueOrSerializedError) => {
+                      console.log(rejectedValueOrSerializedError);
+                    })
+                }
+              >
                 Delete
               </button>
             </div>
